@@ -1,0 +1,49 @@
+--After creating the project in sonarcloud these are my values
+
+sonar-scanner.bat \
+  -D"sonar.organization=eglibecerra" \
+  -D"sonar.projectKey=eglibecerra_mslearn-tailspin-spacegame-web" \
+  -D"sonar.sources=." \
+  -D"sonar.host.url=https://sonarcloud.io" \
+  -D"sonar.login=b9806ca65a979aa2831c717a411c26b48757d42d"
+
+--In Bash created these values
+
+SONAR_PROJECT_KEY=eglibecerra_mslearn-tailspin-spacegame-web
+SONAR_ORGANIZATION=eglibecerra
+SONAR_LOGIN=b9806ca65a979aa2831c717a411c26b48757d42d
+
+--Created the HOME Directory to be:
+export HOME="C:\Users\ebecerra"
+
+
+--Then ran this command but did not work 
+$$HOME/.dotnet/tools/dotnet-sonarscanner begin \
+  /k:"$SONAR_PROJECT_KEY" \
+  /d:sonar.host.url="https://sonarcloud.io" \
+  /d:sonar.login="$SONAR_LOGIN" \
+  /d:sonar.cs.opencover.reportsPaths="./Tailspin.SpaceGame.Web.Tests/TestResults/Coverage/coverage.opencover.xml" \
+  /d:sonar.exclusions="**/wwwroot/lib/**/*" \
+  /o:"$SONAR_ORGANIZATION"
+  
+--This one worked
+  MSYS2_ARG_CONV_EXCL="*" $HOME/.dotnet/tools/dotnet-sonarscanner begin \
+  /k:"$SONAR_PROJECT_KEY" \
+  /d:sonar.host.url="https://sonarcloud.io" \
+  /d:sonar.login="$SONAR_LOGIN" \
+  /d:sonar.cs.opencover.reportsPaths="./Tailspin.SpaceGame.Web.Tests/TestResults/Coverage/coverage.opencover.xml" \
+  /d:sonar.exclusions="**/wwwroot/lib/**/*" \
+  /o:"$SONAR_ORGANIZATION"
+
+-- then in my project folder i ran this : build the project with config release
+dotnet build --no-incremental --configuration Release
+
+--run the test
+MSYS2_ARG_CONV_EXCL="*" dotnet test --no-build \
+  --configuration Release \
+  /p:CollectCoverage=true \
+  /p:CoverletOutputFormat="cobertura%2copencover" \
+  /p:CoverletOutput=./TestResults/Coverage/
+
+--Run this dotnet-sonarscanner end command to complete the scanning session and upload the results to SonarCloud:
+MSYS2_ARG_CONV_EXCL="*" $HOME/.dotnet/tools/dotnet-sonarscanner end /d:sonar.login="$SONAR_LOGIN"
